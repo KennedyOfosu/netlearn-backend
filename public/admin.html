@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NetLearn Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+button,input{font-family:inherit;border:none;background:none;cursor:pointer;-webkit-appearance:none}
+
+/* ═══════════════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════════════ */
+[data-theme="dark"] {
+  --page:    #131314;
+  --sb:      #1b1b1c;
+  --surf:    #1e1e1f;
+  --surf2:   #262627;
+  --surf3:   #2e2e2f;
+  --line:    rgba(255,255,255,.07);
+  --line2:   rgba(255,255,255,.11);
+  --tx:      #e3e3e3;
+  --tx2:     #9aa0a6;
+  --tx3:     #5a5a5a;
+  --hover:   rgba(255,255,255,.055);
+  --act:     rgba(255,77,13,.12);
+  --chip-bg: rgba(255,255,255,.06);
+  --shadow:  0 1px 3px rgba(0,0,0,.6);
+}
+[data-theme="light"] {
+  --page:    #f0f4f9;
+  --sb:      #ffffff;
+  --surf:    #ffffff;
+  --surf2:   #f0f4f9;
+  --surf3:   #e8eaed;
+  --line:    #e8eaed;
+  --line2:   #d3d6db;
+  --tx:      #202124;
+  --tx2:     #5f6368;
+  --tx3:     #adb5bd;
+  --hover:   rgba(0,0,0,.04);
+  --act:     rgba(255,77,13,.07);
+  --chip-bg: rgba(0,0,0,.05);
+  --shadow:  0 1px 3px rgba(0,0,0,.1);
+}
+:root {
+  --o:  #ff4d0d;
+  --oh: rgba(255,77,13,.12);
+  --ta: #7c3aed; --ta-bg:rgba(124,58,237,.12);
+  --qz: #0ea5e9; --qz-bg:rgba(14,165,233,.12);
+  --cl: #10b981; --cl-bg:rgba(16,185,129,.12);
+  --ok: #34d399; --ok-bg:rgba(52,211,153,.1);
+  --er: #f87171; --er-bg:rgba(248,113,113,.1);
+  --font:'Inter',system-ui,sans-serif;
+  --mono:'Roboto Mono',monospace;
+  --r:6px; --rl:10px; --t:all .15s ease;
+}
+
+html,body{min-height:100vh;font-family:var(--font);-webkit-font-smoothing:antialiased;font-size:14px;}
+body{background:var(--page);color:var(--tx);overflow:hidden;}
+
+/* ═══════════════════════════════════════════════════════
+   AUTH  — clean, Supabase-like login
+═══════════════════════════════════════════════════════ */
+#auth{
+  position:fixed;inset:0;z-index:300;
+  background:var(--page);
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s;
+}
+.auth-card{
+  background:var(--surf);
+  border:1px solid var(--line2);
+  border-radius:14px;
+  padding:40px 36px 32px;
+  width:100%;max-width:380px;
+  text-align:center;
+}
+.auth-ring{
+  width:52px;height:52px;border-radius:50%;
+  background:var(--surf2);border:1px solid var(--line2);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 26px;position:relative;
+}
+.auth-ring::after{
+  content:'';position:absolute;inset:7px;border-radius:50%;
+  border:1.5px dashed var(--tx3);
+  animation:spin 14s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.auth-dot{
+  width:16px;height:16px;border-radius:50%;
+  background:linear-gradient(135deg,#ff4d0d,#ff8040);
+  box-shadow:0 2px 10px rgba(255,77,13,.5);
+  position:relative;z-index:1;
+}
+.auth-h{font-size:22px;font-weight:600;color:var(--tx);letter-spacing:-.03em;margin-bottom:6px;}
+.auth-s{font-size:13px;color:var(--tx2);margin-bottom:26px;line-height:1.55;}
+.auth-s strong{color:var(--tx);font-weight:500;}
+.auth-inp{
+  width:100%;background:var(--surf2);border:1px solid var(--line2);
+  border-radius:8px;padding:10px 14px;color:var(--tx);
+  font-family:var(--mono);font-size:14px;outline:none;
+  transition:var(--t);margin-bottom:10px;text-align:left;
+  letter-spacing:.03em;
+}
+.auth-inp::placeholder{color:var(--tx3);font-family:var(--font);letter-spacing:0;}
+.auth-inp:focus{border-color:var(--o);box-shadow:0 0 0 2px rgba(255,77,13,.15);}
+.auth-inp.err{border-color:var(--er);}
+.auth-btn{
+  width:100%;padding:10px;background:var(--o);border-radius:50px;
+  color:#fff;font-size:13px;font-weight:600;letter-spacing:.01em;
+  transition:var(--t);box-shadow:0 2px 10px rgba(255,77,13,.3);
+}
+.auth-btn:hover{background:#e84300;box-shadow:0 4px 16px rgba(255,77,13,.4);transform:translateY(-1px);}
+.auth-err{font-size:12px;color:var(--er);margin-top:8px;min-height:16px;}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:11px;color:var(--tx3);}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--line);}
+.auth-theme-btn{
+  width:100%;padding:9px;border:1px solid var(--line2);border-radius:8px;
+  color:var(--tx2);font-size:13px;font-weight:400;transition:var(--t);
+  display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.auth-theme-btn:hover{border-color:var(--o);color:var(--o);}
+.auth-footer{margin-top:18px;font-size:11px;color:var(--tx3);line-height:1.6;}
+.auth-footer a{color:var(--tx2);text-decoration:underline;cursor:pointer;}
+
+/* ═══════════════════════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════════════════════ */
+#app{display:none;height:100vh;grid-template-columns:240px 1fr;}
+#app.on{display:grid;}
+
+/* ═══════════════════════════════════════════════════════
+   SIDEBAR  — Google AI Studio style
+═══════════════════════════════════════════════════════ */
+.sb{
+  background:var(--sb);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;
+  height:100vh;overflow:hidden;
+  transition:background .2s,border-color .2s;
+}
+
+/* Logo / brand row */
+.sb-brand{
+  display:flex;align-items:center;gap:10px;
+  padding:16px 18px 14px;
+  border-bottom:1px solid var(--line);
+}
+.sb-brand-icon{
+  width:26px;height:26px;border-radius:6px;
+  background:var(--o);display:flex;align-items:center;
+  justify-content:center;font-size:13px;flex-shrink:0;
+}
+.sb-brand-name{font-size:14px;font-weight:600;color:var(--tx);letter-spacing:-.01em;}
+.sb-brand-sub{font-size:10px;color:var(--tx3);letter-spacing:.05em;text-transform:uppercase;margin-top:1px;}
+
+/* Nav */
+.sb-nav{flex:1;overflow-y:auto;padding:10px 8px;}
+.sb-nav::-webkit-scrollbar{display:none;}
+
+.nav-section-label{
+  font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--tx3);padding:12px 10px 5px;
+}
+
+.nav-item{
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:7px 10px;border-radius:var(--r);
+  color:var(--tx2);font-size:13px;font-weight:400;
+  transition:var(--t);text-align:left;
+}
+.nav-item:hover{background:var(--hover);color:var(--tx);}
+.nav-item.active{
+  background:var(--act);color:var(--o);font-weight:500;
+}
+.nav-item-icon{
+  width:16px;height:16px;flex-shrink:0;opacity:.7;
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+}
+.nav-item.active .nav-item-icon{opacity:1;}
+.nav-badge{
+  margin-left:auto;font-size:10px;font-weight:600;
+  padding:1px 6px;border-radius:50px;
+  background:var(--oh);color:var(--o);
+}
+
+/* Live status */
+.sb-live{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;font-size:12px;color:var(--tx3);
+}
+.ldot{width:6px;height:6px;border-radius:50%;background:var(--ok);flex-shrink:0;animation:pulse 1.8s ease-in-out infinite;}
+.ldot.off{background:var(--er);animation:none;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+.sb-live-txt{color:var(--tx2);font-weight:500;}
+.sb-live-cnt{margin-left:auto;color:var(--tx3);}
+
+.sb-bottom{border-top:1px solid var(--line);padding:8px 8px 12px;}
+
+/* ═══════════════════════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════════════════════ */
+.main{
+  display:flex;flex-direction:column;
+  height:100vh;overflow:hidden;
+  background:var(--page);transition:background .2s;
+}
+
+/* Top header bar — like AI Studio's thin bar */
+.main-hdr{
+  display:flex;align-items:center;
+  padding:0 24px;height:48px;flex-shrink:0;
+  border-bottom:1px solid var(--line);
+  background:var(--sb);transition:background .2s,border-color .2s;
+}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;}
+.bc-item{color:var(--tx2);font-weight:400;cursor:pointer;transition:var(--t);}
+.bc-item:hover{color:var(--tx);}
+.bc-sep{color:var(--tx3);font-size:11px;margin:0 1px;}
+.bc-cur{color:var(--tx);font-weight:500;}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
+.hdr-chip{
+  display:flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:50px;
+  font-size:11px;font-weight:500;
+  background:var(--chip-bg);color:var(--tx2);
+  border:1px solid var(--line2);
+}
+.hdr-chip.live{background:var(--ok-bg);color:var(--ok);border-color:rgba(52,211,153,.2);}
+.hdr-chip.off{background:var(--er-bg);color:var(--er);border-color:rgba(248,113,113,.2);}
+
+/* Scrollable content area */
+.main-body{flex:1;overflow-y:auto;padding:24px;}
+.main-body::-webkit-scrollbar{width:6px;}
+.main-body::-webkit-scrollbar-track{background:transparent;}
+.main-body::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px;}
+
+/* Views */
+.view{display:none;animation:fi .18s ease;}
+.view.on{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+
+/* Page title */
+.pg-title{font-size:18px;font-weight:600;letter-spacing:-.02em;color:var(--tx);margin-bottom:4px;}
+.pg-sub{font-size:12px;color:var(--tx2);margin-bottom:20px;}
+
+/* ═══════════════════════════════════════════════════════
+   METRIC STRIP  — compact chips, AI Studio style
+═══════════════════════════════════════════════════════ */
+.metric-strip{
+  display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;
+}
+.metric-chip{
+  background:var(--surf);border:1px solid var(--line);
+  border-radius:var(--rl);padding:12px 16px;
+  flex:1;min-width:120px;
+  transition:var(--t);
+}
+.metric-chip:hover{border-color:var(--line2);}
+.mc-val{font-size:24px;font-weight:700;letter-spacing:-.03em;line-height:1;margin-bottom:3px;}
+.mc-val.o{color:var(--o);}
+.mc-val.b{color:var(--qz);}
+.mc-val.g{color:var(--cl);}
+.mc-val.v{color:var(--ta);}
+.mc-lbl{font-size:11px;color:var(--tx2);font-weight:400;}
+.mc-sub{font-size:11px;color:var(--tx3);margin-top:2px;}
+
+/* ═══════════════════════════════════════════════════════
+   CONTENT LAYOUT (table + feed side by side)
+═══════════════════════════════════════════════════════ */
+.content-row{display:grid;grid-template-columns:1fr 280px;gap:14px;}
+
+/* ═══════════════════════════════════════════════════════
+   PANEL (card)
+═══════════════════════════════════════════════════════ */
+.panel{
+  background:var(--surf);border:1px solid var(--line);
+  border-radius:var(--rl);overflow:hidden;
+  transition:background .2s,border-color .2s;
+}
+.panel-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 16px;border-bottom:1px solid var(--line);
+}
+.panel-title{font-size:13px;font-weight:500;color:var(--tx);display:flex;align-items:center;gap:7px;}
+.panel-actions{display:flex;gap:6px;align-items:center;}
+
+/* ═══════════════════════════════════════════════════════
+   GAME SELECTOR TABS — compact, AI Studio style
+═══════════════════════════════════════════════════════ */
+.game-tabs{display:flex;gap:2px;padding:8px 12px;background:var(--surf2);border-bottom:1px solid var(--line);}
+.gtab{
+  padding:5px 12px;border-radius:var(--r);
+  font-size:12px;font-weight:500;color:var(--tx2);
+  transition:var(--t);
+}
+.gtab:hover{background:var(--hover);color:var(--tx);}
+.gtab.on{background:var(--oh);color:var(--o);}
+
+/* ═══════════════════════════════════════════════════════
+   TABLE  — minimal AI Studio-like data table
+═══════════════════════════════════════════════════════ */
+.dtbl{width:100%;border-collapse:collapse;}
+.dtbl th{
+  font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--tx3);padding:8px 16px;text-align:left;
+  background:var(--surf2);border-bottom:1px solid var(--line);
+  white-space:nowrap;
+}
+.dtbl th:last-child{text-align:right;}
+.dtbl td{
+  padding:9px 16px;border-bottom:1px solid var(--line);
+  font-size:13px;color:var(--tx);transition:background .1s;
+}
+.dtbl tr:last-child td{border-bottom:none;}
+.dtbl tbody tr:hover td{background:var(--hover);}
+.dtbl tr.r1 td{background:rgba(251,191,36,.04);}
+.dtbl tr.r2 td{background:rgba(209,213,219,.03);}
+.dtbl tr.r3 td{background:rgba(205,127,50,.03);}
+.td-rk{font-size:14px;width:36px;padding-left:16px;}
+.td-nm{font-weight:500;}
+.td-mn{font-family:var(--mono);font-size:11px;color:var(--tx2);}
+.td-tm{font-size:11px;color:var(--tx2);text-align:right;font-family:var(--mono);}
+.td-sc{font-family:var(--mono);font-size:13px;font-weight:600;text-align:right;}
+.td-sc.ta{color:var(--ta);}
+.td-sc.qz{color:var(--qz);}
+.td-sc.cl{color:var(--cl);}
+.tbl-footer{padding:8px 16px;font-size:11px;color:var(--tx3);background:var(--surf2);}
+
+/* Game badge pill */
+.gbadge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:50px;font-size:10px;font-weight:600;}
+.gbadge.ta{background:var(--ta-bg);color:var(--ta);}.gbadge.qz{background:var(--qz-bg);color:var(--qz);}.gbadge.cl{background:var(--cl-bg);color:var(--cl);}
+
+/* ═══════════════════════════════════════════════════════
+   LIVE FEED
+═══════════════════════════════════════════════════════ */
+.feed-panel{display:flex;flex-direction:column;max-height:480px;}
+.feed-list{overflow-y:auto;flex:1;}
+.feed-list::-webkit-scrollbar{display:none;}
+
+.feed-item{
+  display:flex;align-items:flex-start;gap:9px;
+  padding:9px 14px;border-bottom:1px solid var(--line);
+  animation:feedIn .25s ease;transition:background .1s;
+}
+@keyframes feedIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.feed-item:last-child{border-bottom:none;}
+.feed-item.new{background:rgba(255,77,13,.04);}
+.feed-av{
+  width:28px;height:28px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;flex-shrink:0;
+}
+.feed-av.ta{background:var(--ta-bg);color:var(--ta);}.feed-av.qz{background:var(--qz-bg);color:var(--qz);}.feed-av.cl{background:var(--cl-bg);color:var(--cl);}
+.feed-body{flex:1;min-width:0;}
+.feed-name{font-size:12px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.feed-meta{font-size:11px;color:var(--tx2);margin-top:1px;}
+.feed-time{font-size:10px;color:var(--tx3);}
+.feed-score{font-family:var(--mono);font-size:12px;font-weight:600;flex-shrink:0;text-align:right;}
+.feed-score.ta{color:var(--ta);}.feed-score.qz{color:var(--qz);}.feed-score.cl{color:var(--cl);}
+
+/* Mini stats row inside feed panel */
+.feed-meta-row{
+  display:flex;gap:0;border-bottom:1px solid var(--line);
+}
+.feed-mini{flex:1;padding:8px 12px;text-align:center;border-right:1px solid var(--line);}
+.feed-mini:last-child{border-right:none;}
+.fm-val{font-size:18px;font-weight:700;color:var(--o);font-family:var(--mono);}
+.fm-lbl{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-top:1px;}
+
+/* Empty state */
+.empty{padding:36px 16px;text-align:center;color:var(--tx2);}
+.empty-ico{font-size:24px;opacity:.4;margin-bottom:8px;}
+.empty-txt{font-size:12px;line-height:1.6;}
+
+/* ═══════════════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════════════ */
+.btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:5px 11px;border-radius:var(--r);font-size:12px;font-weight:500;
+  transition:var(--t);border:1px solid var(--line2);color:var(--tx2);
+}
+.btn:hover{color:var(--tx);border-color:var(--line2);background:var(--hover);}
+.btn-accent{background:var(--oh);color:var(--o);border-color:rgba(255,77,13,.2);}
+.btn-accent:hover{background:var(--o);color:#fff;border-color:var(--o);}
+.btn-green{background:var(--ok-bg);color:var(--ok);border-color:rgba(52,211,153,.2);}
+.btn-green:hover{background:var(--ok);color:#fff;}
+
+/* ═══════════════════════════════════════════════════════
+   LEADERBOARD VIEW  — full-width table
+═══════════════════════════════════════════════════════ */
+#view-leaderboard .panel{width:100%;}
+
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════════ */
+@media(max-width:1024px){.content-row{grid-template-columns:1fr;}}
+@media(max-width:768px){
+  #app{grid-template-columns:1fr;}
+  .sb{display:none;}
+  .main-body{padding:16px;}
+  .metric-strip{gap:8px;}
+  .metric-chip{min-width:100px;}
+  .charts-row{grid-template-columns:1fr;}
+  .ov-bottom{grid-template-columns:1fr;}
+}
+
+/* ═══ CHARTS ROW ══════════════════════════════════════ */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.chart-wrap{padding:14px 16px 10px;height:190px;position:relative;}
+.chart-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx2);margin-bottom:10px;}
+
+/* Legend row for donut chart */
+.chart-legend{display:flex;gap:12px;padding:8px 16px 12px;flex-wrap:wrap;border-top:1px solid var(--line);}
+.cl-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--tx2);}
+.cl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ═══ OV-BOTTOM LAYOUT ══════════════════════════════════ */
+.ov-bottom{display:grid;grid-template-columns:1fr 280px;gap:14px;}
+.ov-left{display:flex;flex-direction:column;gap:14px;}
+
+/* ═══ CHAMPIONS CARD ═══════════════════════════════════ */
+.champ-content{display:flex;align-items:stretch;min-height:160px;}
+.champ-hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 16px;text-align:center;border-right:1px solid var(--line);}
+.champ-av-wrap{position:relative;margin-bottom:10px;}
+.champ-av{
+  width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:24px;font-weight:800;color:var(--o);
+  background:var(--oh);border:2px solid rgba(255,77,13,.3);
+}
+.champ-crown{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:18px;}
+.champ-hero-name{font-size:15px;font-weight:700;color:var(--tx);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;}
+.champ-hero-score{font-size:26px;font-weight:900;color:var(--o);font-family:var(--mono);line-height:1;}
+.champ-hero-lbl{font-size:10px;color:var(--tx2);font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-top:1px;}
+.champ-badge{
+  display:inline-flex;align-items:center;gap:4px;padding:2px 9px;
+  border-radius:50px;font-size:10px;font-weight:700;
+  background:rgba(255,215,0,.1);color:#f5c518;
+  border:1px solid rgba(255,215,0,.25);margin-top:8px;
+}
+
+/* Runner-up rows (right side of champions card) */
+.champ-runners{flex:1;display:flex;flex-direction:column;justify-content:center;}
+.champ-row{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);}
+.champ-row:last-child{border-bottom:none;}
+.cr-medal{font-size:16px;width:20px;flex-shrink:0;text-align:center;}
+.cr-av{
+  width:32px;height:32px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;flex-shrink:0;
+}
+.cr-av.s{background:rgba(192,192,192,.15);color:#c0c0c0;}
+.cr-av.b{background:rgba(205,127,50,.15);color:#cd7f32;}
+.cr-nm{flex:1;font-size:13px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cr-sc{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--tx2);flex-shrink:0;}
+.champ-empty{flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--tx3);padding:20px;text-align:center;}
+
+/* Champ game tab row */
+.champ-tabs{display:flex;gap:2px;padding:8px 12px;background:var(--surf2);border-bottom:1px solid var(--line);}
+.ctab{padding:5px 12px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--tx2);transition:var(--t);cursor:pointer;background:none;border:none;}
+.ctab:hover{background:var(--hover);color:var(--tx);}
+.ctab.on{background:var(--oh);color:var(--o);}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     AUTH
+═══════════════════════════════════════════════════ -->
+<div id="auth">
+  <div class="auth-card">
+    <div class="auth-ring"><div class="auth-dot"></div></div>
+
+    <div class="auth-h">Yooo, welcome back!</div>
+    <div class="auth-s">First time here? <strong>Contact your administrator.</strong></div>
+
+    <input class="auth-inp" id="auth-inp" type="password"
+      placeholder="Your admin key"
+      onkeydown="if(event.key==='Enter')login()"/>
+    <button class="auth-btn" onclick="login()">Access Dashboard →</button>
+    <div class="auth-err" id="auth-err"></div>
+
+    <div class="auth-divider">or</div>
+    <button class="auth-theme-btn" onclick="toggleTheme()" id="auth-tb">
+      <span id="auth-ti">🌙</span><span id="auth-tl">Toggle theme</span>
+    </button>
+
+    <div class="auth-footer">
+      You acknowledge that you read, and agree to our
+      <a>Terms of Use</a> and our <a>Privacy Policy</a>.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     APP SHELL
+═══════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- ──────── SIDEBAR ──────── -->
+  <aside class="sb">
+    <div class="sb-brand">
+      <div class="sb-brand-icon">🧠</div>
+      <div>
+        <div class="sb-brand-name">NetLearn</div>
+        <div class="sb-brand-sub">Admin Console</div>
+      </div>
+    </div>
+
+    <nav class="sb-nav">
+
+      <div class="nav-section-label">General</div>
+      <button class="nav-item active" id="n-overview" onclick="showView('overview',this)">
+        <span class="nav-item-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </span>
+        Overview
+      </button>
+
+      <div class="nav-section-label">Leaderboards</div>
+      <button class="nav-item" id="n-ta" onclick="openLeaderboard('time_attack',this)">
+        <span class="nav-item-icon">⚡</span>Time Attack
+      </button>
+      <button class="nav-item" id="n-qz" onclick="openLeaderboard('quiz',this)">
+        <span class="nav-item-icon">❓</span>Quiz
+      </button>
+      <button class="nav-item" id="n-cl" onclick="openLeaderboard('ip_class',this)">
+        <span class="nav-item-icon">🔥</span>IP Class
+      </button>
+
+      <div class="nav-section-label">Monitor</div>
+      <button class="nav-item" id="n-feed" onclick="showView('feed',this)">
+        <span class="nav-item-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49"/><path d="M7.76 7.76a6 6 0 0 0 0 8.49"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        </span>
+        Live Feed
+        <span class="nav-badge" id="feed-badge">0</span>
+      </button>
+
+    </nav>
+
+    <div class="sb-bottom">
+      <div class="sb-live">
+        <div class="ldot off" id="sb-ldot"></div>
+        <span class="sb-live-txt" id="sb-ltxt">Connecting…</span>
+        <span class="sb-live-cnt" id="sb-lc">0</span>
+      </div>
+      <button class="nav-item" onclick="toggleTheme()">
+        <span class="nav-item-icon" id="t-ico">☀️</span>
+        <span id="t-lbl">Light mode</span>
+      </button>
+      <button class="nav-item" style="color:var(--er);" onclick="doLogout()">
+        <span class="nav-item-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </span>
+        Sign out
+      </button>
+    </div>
+  </aside>
+
+  <!-- ──────── MAIN ──────── -->
+  <main class="main">
+
+    <!-- Thin header bar -->
+    <div class="main-hdr">
+      <div class="breadcrumb">
+        <span class="bc-item" onclick="showView('overview',null)">NetLearn</span>
+        <span class="bc-sep">›</span>
+        <span class="bc-cur" id="bc-cur">Overview</span>
+      </div>
+      <div class="hdr-right">
+        <div class="hdr-chip off" id="hdr-live">
+          <div class="ldot off" id="hdr-ldot"></div>
+          <span id="hdr-ltxt">Connecting</span>
+        </div>
+        <div class="hdr-chip" id="hdr-conn">0 online</div>
+      </div>
+    </div>
+
+    <!-- Scrollable body -->
+    <div class="main-body">
+
+      <!-- ──── OVERVIEW VIEW ──── -->
+      <div class="view on" id="view-overview">
+        <div class="pg-title">Overview</div>
+        <div class="pg-sub">Real-time statistics across all NetLearn games</div>
+
+        <!-- Metric strip -->
+        <div class="metric-strip">
+          <div class="metric-chip">
+            <div class="mc-val o" id="st-players">—</div>
+            <div class="mc-lbl">Total Players</div>
+            <div class="mc-sub" id="st-subs">— submissions</div>
+          </div>
+          <div class="metric-chip">
+            <div class="mc-val b" id="st-today">—</div>
+            <div class="mc-lbl">Games Today</div>
+            <div class="mc-sub">last 24 hours</div>
+          </div>
+          <div class="metric-chip">
+            <div class="mc-val g" id="st-high">—</div>
+            <div class="mc-lbl">All-Time High</div>
+            <div class="mc-sub" id="st-high-p">—</div>
+          </div>
+          <div class="metric-chip">
+            <div class="mc-val v" id="st-active" style="font-size:16px;padding-top:2px;">—</div>
+            <div class="mc-lbl">Most Active</div>
+            <div class="mc-sub" id="st-active-c">—</div>
+          </div>
+        </div>
+
+        <!-- Charts row -->
+        <div class="charts-row">
+          <!-- Game distribution donut -->
+          <div class="panel">
+            <div class="panel-hdr">
+              <div class="panel-title">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 7.07 17.07"/></svg>
+                Game Distribution
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="chart-dist"></canvas></div>
+            <div class="chart-legend" id="chart-dist-legend"></div>
+          </div>
+          <!-- 7-day activity bar -->
+          <div class="panel">
+            <div class="panel-hdr">
+              <div class="panel-title">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Activity — Last 7 Days
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="chart-weekly"></canvas></div>
+          </div>
+        </div>
+
+        <!-- OV-BOTTOM: champions + recent scores | live feed -->
+        <div class="ov-bottom">
+          <div class="ov-left">
+
+            <!-- Champions card -->
+            <div class="panel" id="champ-panel">
+              <div class="panel-hdr">
+                <div class="panel-title">🏆 Champions</div>
+                <div class="panel-actions">
+                  <button class="ctab on" id="ct-time_attack" onclick="showChamp('time_attack',this)">⚡ TA</button>
+                  <button class="ctab" id="ct-quiz" onclick="showChamp('quiz',this)">❓ Quiz</button>
+                  <button class="ctab" id="ct-ip_class" onclick="showChamp('ip_class',this)">🔥 IPC</button>
+                </div>
+              </div>
+              <div class="champ-content" id="champ-content">
+                <div class="champ-empty">Loading champions…</div>
+              </div>
+            </div>
+
+            <!-- Recent scores panel -->
+            <div class="panel">
+              <div class="panel-hdr">
+                <div class="panel-title">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                  Recent Scores
+                </div>
+                <div class="panel-actions">
+                  <button class="btn" onclick="loadStats()">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                    Refresh
+                  </button>
+                </div>
+              </div>
+              <div id="recent-body">
+                <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading recent activity…</div></div>
+              </div>
+            </div>
+
+          </div><!-- /ov-left -->
+
+          <!-- Live feed panel -->
+          <div class="panel feed-panel">
+            <div class="panel-hdr">
+              <div class="panel-title">
+                <div class="ldot" id="fdot" style="width:6px;height:6px;opacity:.5"></div>
+                Live Feed
+              </div>
+              <span style="font-size:11px;color:var(--tx2);" id="fcount-lbl">0 events</span>
+            </div>
+            <div class="feed-meta-row">
+              <div class="feed-mini"><div class="fm-val" id="ms-ta">0</div><div class="fm-lbl">TA</div></div>
+              <div class="feed-mini"><div class="fm-val" id="ms-qz">0</div><div class="fm-lbl">Quiz</div></div>
+              <div class="feed-mini"><div class="fm-val" id="ms-cl">0</div><div class="fm-lbl">IPC</div></div>
+            </div>
+            <div class="feed-list" id="fl-ov">
+              <div class="empty"><div class="empty-ico">📡</div><div class="empty-txt">Waiting for players…</div></div>
+            </div>
+          </div>
+
+        </div><!-- /ov-bottom -->
+      </div>
+
+      <!-- ──── LEADERBOARD VIEW ──── -->
+      <div class="view" id="view-leaderboard">
+        <div class="pg-title" id="lb-pg-title">⚡ Time Attack</div>
+        <div class="pg-sub">Best score per player, all time</div>
+
+        <div class="panel">
+          <div class="game-tabs">
+            <button class="gtab on" id="gt-time_attack" onclick="switchGame('time_attack')">⚡ Time Attack</button>
+            <button class="gtab" id="gt-quiz" onclick="switchGame('quiz')">❓ Quiz</button>
+            <button class="gtab" id="gt-ip_class" onclick="switchGame('ip_class')">🔥 IP Class</button>
+          </div>
+          <div class="panel-hdr" style="border-top:none;">
+            <div class="panel-title" id="lb-panel-title">⚡ Time Attack Leaderboard</div>
+            <div class="panel-actions">
+              <button class="btn" onclick="loadLB()">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                Refresh
+              </button>
+              <button class="btn btn-green" onclick="doExport()">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+          <div id="lb-body">
+            <div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ──── LIVE FEED VIEW ──── -->
+      <div class="view" id="view-feed">
+        <div class="pg-title">Live Feed</div>
+        <div class="pg-sub">Every score submission in real-time</div>
+
+        <div class="panel">
+          <div class="panel-hdr">
+            <div class="panel-title">
+              <div class="ldot" id="fdot-main" style="width:6px;height:6px;"></div>
+              Activity Stream
+            </div>
+            <span style="font-size:11px;color:var(--tx2);" id="fcount-main">0 events</span>
+          </div>
+          <div class="feed-list" id="fl-main" style="max-height:calc(100vh - 260px);">
+            <div class="empty"><div class="empty-ico">📡</div><div class="empty-txt">Waiting for players to submit scores…</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-body -->
+  </main>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════ */
+let adminKey = '', activeGame = 'time_attack';
+let feedCount = 0, gameCounts = {time_attack:0,quiz:0,ip_class:0};
+let lbData = [], socket;
+let feedSeeded = false; /* prevents duplicate seed on each loadStats interval */
+
+const G = {
+  time_attack:{ label:'Time Attack', cls:'ta', icon:'⚡', unit:'pts'  },
+  quiz:       { label:'Quiz',        cls:'qz', icon:'❓', unit:' pts' },
+  ip_class:   { label:'IP Class',    cls:'cl', icon:'🔥', unit:' best'}
+};
+
+/* ═══════════════════════════════════════════════════
+   THEME
+═══════════════════════════════════════════════════ */
+function toggleTheme(){
+  const dark = document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme', dark?'light':'dark');
+  localStorage.setItem('nl-adm-theme', dark?'light':'dark');
+  syncTheme();
+}
+function syncTheme(){
+  const dark = document.documentElement.getAttribute('data-theme')==='dark';
+  const icon = dark ? '☀️' : '🌙';
+  const lbl  = dark ? 'Light mode' : 'Dark mode';
+  s('t-ico').textContent   = icon;
+  s('t-lbl').textContent   = lbl;
+  s('auth-ti').textContent = dark ? '☀️' : '🌙';
+  s('auth-tl').textContent = dark ? 'Light mode' : 'Dark mode';
+}
+(function(){
+  const saved = localStorage.getItem('nl-adm-theme')||'dark';
+  document.documentElement.setAttribute('data-theme',saved);
+  syncTheme();
+})();
+
+/* ═══════════════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════════════ */
+async function login(){
+  const key = s('auth-inp').value.trim();
+  if(!key) return;
+  try{
+    const r = await fetch('/api/admin/verify?key='+encodeURIComponent(key));
+    if(r.ok){
+      adminKey = key;
+      localStorage.setItem('nl-admin-key', key);
+      s('auth').style.display = 'none';
+      s('app').classList.add('on');
+      document.body.style.overflow = 'hidden';
+      initDash();
+    } else {
+      const inp = s('auth-inp');
+      inp.classList.add('err');
+      s('auth-err').textContent = '✗ Invalid admin key.';
+      setTimeout(()=>inp.classList.remove('err'),1500);
+    }
+  } catch(e){ s('auth-err').textContent = '✗ Cannot reach server.'; }
+}
+function doLogout(){
+  adminKey='';
+  localStorage.removeItem('nl-admin-key');
+  s('auth-inp').value='';
+  s('auth-err').textContent='';
+  s('auth').style.display='flex';
+  s('app').classList.remove('on');
+  if(socket) socket.disconnect();
+  /* Reset feed state so re-login gets a fresh seed */
+  feedSeeded = false;
+  feedCount  = 0;
+  gameCounts = {time_attack:0,quiz:0,ip_class:0};
+}
+(function(){
+  const k=localStorage.getItem('nl-admin-key');
+  if(k){s('auth-inp').value=k;setTimeout(login,150);}
+})();
+
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+async function initDash(){
+  initSocket();
+  await loadStats();
+  loadChampions();
+  setInterval(loadStats, 30000);
+  setInterval(loadChampions, 60000); /* Refresh champions every minute */
+}
+
+/* ═══════════════════════════════════════════════════
+   SOCKET
+═══════════════════════════════════════════════════ */
+function initSocket(){
+  socket = io();
+  socket.on('connect',    ()=>setLive(true));
+  socket.on('disconnect', ()=>setLive(false));
+  socket.on('connection_count', n=>{
+    /* total socket connections — not shown in main UI */
+  });
+  socket.on('player_count', n=>{
+    /* actual NetLearn Platform players online */
+    s('sb-lc').textContent    = n;
+    s('hdr-conn').textContent = n+' online';
+    s('sb-ltxt').textContent  = n===1?'1 player live':n+' players live';
+  });
+  socket.on('leaderboard_update',({game,entries})=>{
+    if(game===activeGame && s('view-leaderboard').classList.contains('on'))
+      renderLB(entries);
+  });
+  socket.on('admin_feed', entry=>{
+    pushFeed(entry, true);
+    const el=s('st-today'); el.textContent=(parseInt(el.textContent)||0)+1;
+    gameCounts[entry.game]=(gameCounts[entry.game]||0)+1;
+    updateFeedMini();
+  });
+}
+function setLive(live){
+  ['sb-ldot','hdr-ldot','fdot','fdot-main'].forEach(id=>{
+    const e=s(id);if(!e)return;
+    e.classList.toggle('off',!live);e.style.opacity='1';
+  });
+  const hc=s('hdr-live');
+  if(hc) hc.className='hdr-chip '+(live?'live':'off');
+  s('sb-ltxt').textContent = live?'Live':'Offline';
+  s('hdr-ltxt').textContent= live?'LIVE':'OFFLINE';
+}
+
+/* ═══════════════════════════════════════════════════
+   VIEWS
+═══════════════════════════════════════════════════ */
+const LABELS = {overview:'Overview',leaderboard:'Leaderboard',feed:'Live Feed'};
+function showView(id, btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  s('view-'+id).classList.add('on');
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  const nb=s('n-'+id);if(nb)nb.classList.add('active');
+  if(btn)btn.classList.add('active');
+  s('bc-cur').textContent = LABELS[id]||id;
+  if(id==='leaderboard') loadLB();
+}
+function openLeaderboard(game, btn){
+  activeGame=game;
+  showView('leaderboard',btn);
+  updateGameTabs();
+  updateLBHeader();
+  loadLB();
+}
+
+/* ═══════════════════════════════════════════════════
+   STATS
+═══════════════════════════════════════════════════ */
+async function loadStats(){
+  try{
+    const r=await fetch('/api/admin/stats?key='+encodeURIComponent(adminKey));
+    const d=await r.json();
+    s('st-players').textContent = d.totals.total_players||0;
+    s('st-subs').textContent    = (d.totals.total_submissions||0)+' submissions';
+    s('st-today').textContent   = d.totals.today_count||0;
+    if(d.topScore){
+      s('st-high').textContent  = d.topScore.score;
+      s('st-high-p').textContent= d.topScore.player_name+' · '+(G[d.topScore.game]?.label||d.topScore.game);
+    }
+    if(d.byGame&&d.byGame.length){
+      const top=[...d.byGame].sort((a,b)=>b.total_submissions-a.total_submissions)[0];
+      s('st-active').textContent  = G[top.game]?.icon+' '+(G[top.game]?.label||top.game);
+      s('st-active-c').textContent= top.total_submissions+' submissions';
+    }
+    if(d.recent&&d.recent.length&&!feedSeeded){
+      feedSeeded = true; /* only seed once — prevents doubling on auto-refresh */
+      const fl=s('fl-ov');
+      if(fl.querySelector('.empty')) fl.innerHTML='';
+      d.recent.forEach(r=>pushFeed(r,false,'fl-ov'));
+      renderRecent(d.recent);
+    }
+    /* ── Charts ── */
+    renderDistChart(d.byGame||[]);
+    renderWeeklyChart(d.weekly||[]);
+  }catch(e){console.warn('Stats:',e);}
+}
+
+function renderRecent(rows){
+  if(!rows||!rows.length) return;
+  const medals=['🥇','🥈','🥉'];
+  s('recent-body').innerHTML=`
+    <table class="dtbl">
+      <thead><tr>
+        <th>#</th><th>Player</th><th>Game</th><th>Score</th><th>✓/Total</th><th>When</th>
+      </tr></thead>
+      <tbody>${rows.map((r,i)=>{
+        const g=G[r.game]||{label:r.game,cls:'ta',icon:'🎮'};
+        const rc=i===0?'r1':i===1?'r2':i===2?'r3':'';
+        return `<tr class="${rc}">
+          <td class="td-rk">${i<3?medals[i]:i+1}</td>
+          <td class="td-nm">${esc(r.player_name)}</td>
+          <td><span class="gbadge ${g.cls}">${g.icon} ${g.label}</span></td>
+          <td class="td-sc ${g.cls}">${r.score}</td>
+          <td class="td-mn">${r.correct||0}/${r.total||0}</td>
+          <td class="td-tm">${ago(r.created_at)}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>
+    <div class="tbl-footer">Showing 20 most recent games</div>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   LEADERBOARD
+═══════════════════════════════════════════════════ */
+async function loadLB(){
+  s('lb-body').innerHTML='<div class="empty"><div class="empty-ico">⏳</div><div class="empty-txt">Loading…</div></div>';
+  try{
+    const r=await fetch('/api/leaderboard/'+activeGame);
+    lbData=await r.json();
+    renderLB(lbData);
+  }catch(e){
+    s('lb-body').innerHTML='<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-txt">Failed to load.</div></div>';
+  }
+}
+function renderLB(entries){
+  lbData=entries;
+  const g=G[activeGame];
+  if(!entries||!entries.length){
+    s('lb-body').innerHTML=`<div class="empty"><div class="empty-ico">${g.icon}</div><div class="empty-txt">No scores yet for ${g.label}.</div></div>`;
+    return;
+  }
+  const medals=['🥇','🥈','🥉'],rcs=['r1','r2','r3'];
+  const sh=activeGame==='time_attack'?'Points':activeGame==='ip_class'?'Best Streak':'Score';
+  s('lb-body').innerHTML=`
+    <table class="dtbl">
+      <thead><tr><th>#</th><th>Player</th><th>Correct</th><th>Total</th><th>Last Played</th><th>${sh}</th></tr></thead>
+      <tbody>${entries.map((e,i)=>`<tr class="${rcs[i]||''}">
+        <td class="td-rk">${i<3?medals[i]:i+1}</td>
+        <td class="td-nm">${esc(e.player_name)}</td>
+        <td class="td-mn">${e.correct||0}</td>
+        <td class="td-mn">${e.total||0}</td>
+        <td class="td-tm">${ago(e.created_at)}</td>
+        <td class="td-sc ${g.cls}">${e.score}</td>
+      </tr>`).join('')}</tbody>
+    </table>
+    <div class="tbl-footer">Top ${entries.length} players — best score per player</div>`;
+}
+function switchGame(game){
+  activeGame=game;
+  updateGameTabs();
+  updateLBHeader();
+  loadLB();
+}
+function updateGameTabs(){
+  document.querySelectorAll('.gtab').forEach(t=>t.classList.remove('on'));
+  const el=s('gt-'+activeGame);if(el)el.classList.add('on');
+}
+function updateLBHeader(){
+  const g=G[activeGame];
+  s('lb-pg-title').textContent=g.icon+' '+g.label;
+  s('lb-panel-title').textContent=g.icon+' '+g.label+' Leaderboard';
+}
+
+/* ═══════════════════════════════════════════════════
+   LIVE FEED
+═══════════════════════════════════════════════════ */
+function pushFeed(entry, isNew, targetId){
+  const targets = targetId ? [targetId] : ['fl-ov','fl-main'];
+  targets.forEach(id=>{
+    const fl=s(id);if(!fl)return;
+    if(fl.querySelector('.empty'))fl.innerHTML='';
+    const item=makeFeedItem(entry,isNew);
+    if(isNew){
+      fl.insertBefore(item,fl.firstChild);
+      setTimeout(()=>item.classList.remove('new'),3000);
+    } else fl.appendChild(item);
+    const items=fl.querySelectorAll('.feed-item');
+    if(items.length>40) items[items.length-1].remove();
+  });
+  if(isNew){
+    feedCount++;
+    ['fcount-lbl','fcount-main'].forEach(id=>{
+      const e=s(id);if(e)e.textContent=feedCount+' events';
+    });
+    s('feed-badge').textContent=feedCount;
+  }
+}
+function makeFeedItem(entry,isNew){
+  const g=G[entry.game]||{label:entry.game,cls:'ta',icon:'🎮',unit:'pts'};
+  const el=document.createElement('div');
+  el.className='feed-item'+(isNew?' new':'');
+  const letter=(entry.player_name||'?')[0].toUpperCase();
+  el.innerHTML=`
+    <div class="feed-av ${g.cls}">${letter}</div>
+    <div class="feed-body">
+      <div class="feed-name">${esc(entry.player_name)}</div>
+      <div class="feed-meta">${g.icon} ${g.label}</div>
+      <div class="feed-time">${ago(entry.created_at)}</div>
+    </div>
+    <div class="feed-score ${g.cls}">${entry.score}${g.unit}</div>`;
+  return el;
+}
+function updateFeedMini(){
+  const m={time_attack:'ms-ta',quiz:'ms-qz',ip_class:'ms-cl'};
+  Object.entries(gameCounts).forEach(([g,n])=>{const e=s(m[g]);if(e)e.textContent=n;});
+}
+
+/* ═══════════════════════════════════════════════════
+   EXPORT
+═══════════════════════════════════════════════════ */
+function doExport(){
+  if(!lbData.length) return;
+  const h=['Rank','Player','Score','Correct','Total','When'];
+  const rows=lbData.map((e,i)=>
+    [i+1,e.player_name,e.score,e.correct||0,e.total||0,new Date(e.created_at).toLocaleString()]
+      .map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));
+  const csv=[h.join(','),...rows].join('\n');
+  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  Object.assign(document.createElement('a'),{href:url,download:`netlearn-${activeGame}.csv`}).click();
+  URL.revokeObjectURL(url);
+}
+
+/* ═══════════════════════════════════════════════════
+   CHARTS
+═══════════════════════════════════════════════════ */
+let chartDist = null, chartWeekly = null;
+
+const CHART_COLORS = {
+  time_attack: 'rgba(124,58,237,.85)',
+  quiz:        'rgba(14,165,233,.85)',
+  ip_class:    'rgba(16,185,129,.85)'
+};
+const CHART_BASE = {
+  responsive: true, maintainAspectRatio: false,
+  plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.raw} submissions` } } }
+};
+
+function cssVar(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+function renderDistChart(byGame){
+  const cv = document.getElementById('chart-dist'); if(!cv) return;
+  if(!byGame.length){ cv.parentElement.innerHTML='<div style="height:100%;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--tx3)">No data yet</div>'; return; }
+  const labels = byGame.map(g => G[g.game]?.label||g.game);
+  const vals   = byGame.map(g => parseInt(g.total_submissions)||0);
+  const colors = byGame.map(g => CHART_COLORS[g.game]||'rgba(150,150,150,.7)');
+
+  if(chartDist) chartDist.destroy();
+  chartDist = new Chart(cv, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data: vals, backgroundColor: colors, borderWidth: 0, hoverBorderWidth: 2 }] },
+    options: { ...CHART_BASE, cutout: '72%',
+      plugins: { ...CHART_BASE.plugins, tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw} submissions` } } }
+    }
+  });
+  /* Custom legend */
+  const lg = s('chart-dist-legend');
+  if(lg) lg.innerHTML = byGame.map((g,i) =>
+    `<div class="cl-item"><div class="cl-dot" style="background:${colors[i]}"></div>${G[g.game]?.icon||''} ${G[g.game]?.label||g.game} (${vals[i]})</div>`
+  ).join('');
+}
+
+function renderWeeklyChart(weekly){
+  const cv = document.getElementById('chart-weekly'); if(!cv) return;
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const gridC  = isDark ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)';
+  const tx2    = cssVar('--tx2');
+
+  if(chartWeekly) chartWeekly.destroy();
+  chartWeekly = new Chart(cv, {
+    type: 'bar',
+    data: {
+      labels: weekly.length ? weekly.map(r => r.day) : ['No data'],
+      datasets: [{ data: weekly.length ? weekly.map(r => parseInt(r.submissions)||0) : [0],
+        backgroundColor: 'rgba(255,77,13,.7)', borderRadius: 4, borderSkipped: false }]
+    },
+    options: { ...CHART_BASE,
+      scales: {
+        x: { grid: { color: gridC }, ticks: { color: tx2, font: { size: 10 } } },
+        y: { grid: { color: gridC }, ticks: { color: tx2, font: { size: 10 }, stepSize: 1 }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   CHAMPIONS CARD
+═══════════════════════════════════════════════════ */
+let champData = {}; /* { time_attack:[], quiz:[], ip_class:[] } */
+let champGame = 'time_attack';
+
+async function loadChampions(){
+  await Promise.all(['time_attack','quiz','ip_class'].map(async g => {
+    try {
+      const r = await fetch('/api/leaderboard/'+g);
+      champData[g] = r.ok ? (await r.json()).slice(0,3) : [];
+    } catch(e){ champData[g]=[]; }
+  }));
+  renderChampions();
+}
+
+function showChamp(game, btn){
+  champGame = game;
+  document.querySelectorAll('.ctab').forEach(b => b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  else { const el=s('ct-'+game); if(el) el.classList.add('on'); }
+  renderChampions();
+}
+
+function renderChampions(){
+  const cc = s('champ-content'); if(!cc) return;
+  const g  = G[champGame] || { label:champGame, cls:'ta', icon:'🎮', unit:'pts' };
+  const entries = champData[champGame] || [];
+
+  if(!entries.length){
+    cc.innerHTML = `<div class="champ-empty">${g.icon} No ${g.label} scores yet.<br>Be the first!</div>`;
+    return;
+  }
+
+  const p1 = entries[0]||null, p2 = entries[1]||null, p3 = entries[2]||null;
+  const init = nm => (nm||'?')[0].toUpperCase();
+
+  cc.innerHTML = `
+    <div class="champ-hero">
+      <div class="champ-av-wrap">
+        <div class="champ-av">${init(p1?.player_name)}</div>
+        <div class="champ-crown">👑</div>
+      </div>
+      <div class="champ-hero-name">${esc(p1?.player_name||'Unknown')}</div>
+      <div class="champ-hero-score">${p1?.score||0}</div>
+      <div class="champ-hero-lbl">${g.unit}</div>
+      <span class="champ-badge">🥇 Champion</span>
+    </div>
+    <div class="champ-runners">
+      ${p2 ? `<div class="champ-row">
+        <span class="cr-medal">🥈</span>
+        <div class="cr-av s">${init(p2.player_name)}</div>
+        <span class="cr-nm">${esc(p2.player_name)}</span>
+        <span class="cr-sc">${p2.score} ${g.unit}</span>
+      </div>` : '<div class="champ-empty" style="flex:1;padding:12px">No #2 yet</div>'}
+      ${p3 ? `<div class="champ-row">
+        <span class="cr-medal">🥉</span>
+        <div class="cr-av b">${init(p3.player_name)}</div>
+        <span class="cr-nm">${esc(p3.player_name)}</span>
+        <span class="cr-sc">${p3.score} ${g.unit}</span>
+      </div>` : '<div class="champ-empty" style="flex:1;padding:12px">No #3 yet</div>'}
+    </div>`;
+}
+
+/* ═══════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════ */
+function s(id){return document.getElementById(id);}
+function esc(v){return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function ago(d){
+  if(!d) return '—';
+  const sec=(Date.now()-new Date(d))/1000;
+  if(sec<10)    return 'just now';
+  if(sec<60)    return Math.floor(sec)+'s ago';
+  if(sec<3600)  return Math.floor(sec/60)+'m ago';
+  if(sec<86400) return Math.floor(sec/3600)+'h ago';
+  return Math.floor(sec/86400)+'d ago';
+}
+s('auth-inp').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+</script>
+</body>
+</html>
