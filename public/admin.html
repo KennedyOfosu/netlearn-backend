@@ -764,7 +764,8 @@ body{background:var(--page);color:var(--tx);overflow:hidden;}
 let adminKey = '', activeGame = 'time_attack';
 let feedCount = 0, gameCounts = {time_attack:0,quiz:0,ip_class:0};
 let lbData = [], socket;
-let feedSeeded = false; /* prevents duplicate seed on each loadStats interval */
+let feedSeeded = false;       /* prevents duplicate seed on each loadStats interval */
+let seenFeedIds = new Set(); /* deduplicates every feed entry regardless of source */
 
 const G = {
   time_attack:{ label:'Time Attack', cls:'ta', icon:'⚡', unit:'pts'  },
@@ -828,9 +829,10 @@ function doLogout(){
   s('app').classList.remove('on');
   if(socket) socket.disconnect();
   /* Reset feed state so re-login gets a fresh seed */
-  feedSeeded = false;
-  feedCount  = 0;
-  gameCounts = {time_attack:0,quiz:0,ip_class:0};
+  feedSeeded   = false;
+  feedCount    = 0;
+  gameCounts   = {time_attack:0,quiz:0,ip_class:0};
+  seenFeedIds  = new Set();
 }
 (function(){
   const k=localStorage.getItem('nl-admin-key');
@@ -852,6 +854,14 @@ async function initDash(){
    SOCKET
 ═══════════════════════════════════════════════════ */
 function initSocket(){
+  /* Disconnect any previous socket before creating a new one.
+     This prevents stacked event listeners when initSocket() is
+     called more than once (e.g. after a reconnect or re-login). */
+  if(socket){
+    socket.off(); /* remove all listeners */
+    socket.disconnect();
+    socket = null;
+  }
   socket = io();
   socket.on('connect',    ()=>setLive(true));
   socket.on('disconnect', ()=>setLive(false));
@@ -1019,6 +1029,13 @@ function updateLBHeader(){
    LIVE FEED
 ═══════════════════════════════════════════════════ */
 function pushFeed(entry, isNew, targetId){
+  /* Build a fingerprint from the entry's unique fields.
+     created_at alone is enough when it comes from the DB,
+     but combining all three makes it bullet-proof for seeded
+     records that may share a timestamp edge-case. */
+  const fp = (entry.created_at||'')+'|'+(entry.player_name||'')+'|'+(entry.game||'')+'|'+(entry.score||0);
+  if(seenFeedIds.has(fp)) return; /* already displayed — silently drop */
+  seenFeedIds.add(fp);
   const targets = targetId ? [targetId] : ['fl-ov','fl-main'];
   targets.forEach(id=>{
     const fl=s(id);if(!fl)return;
