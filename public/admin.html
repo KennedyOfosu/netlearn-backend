@@ -251,25 +251,31 @@ body{background:var(--page);color:var(--tx);overflow:hidden;}
 .pg-sub{font-size:12px;color:var(--tx2);margin-bottom:20px;}
 
 /* ═══════════════════════════════════════════════════════
-   METRIC STRIP  — compact chips, AI Studio style
+   METRIC STRIP  — taller chips with icon + sparkline
 ═══════════════════════════════════════════════════════ */
-.metric-strip{
-  display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;
-}
+.metric-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
 .metric-chip{
   background:var(--surf);border:1px solid var(--line);
-  border-radius:var(--rl);padding:12px 16px;
-  flex:1;min-width:120px;
+  border-radius:var(--rl);padding:16px;
+  display:flex;flex-direction:column;gap:10px;min-height:112px;
   transition:var(--t);
 }
 .metric-chip:hover{border-color:var(--line2);}
-.mc-val{font-size:24px;font-weight:700;letter-spacing:-.03em;line-height:1;margin-bottom:3px;}
+.mc-top-row{display:flex;align-items:flex-start;justify-content:space-between;}
+.mc-icon-box{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mc-icon-box.o{background:var(--oh);color:var(--o);}
+.mc-icon-box.b{background:rgba(14,165,233,.12);color:var(--qz);}
+.mc-icon-box.g{background:rgba(16,185,129,.12);color:var(--cl);}
+.mc-icon-box.v{background:rgba(124,58,237,.12);color:var(--ta);}
+.mc-spark{width:72px;height:28px;flex-shrink:0;overflow:visible;}
+.mc-lbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);}
+.mc-bottom-row{display:flex;align-items:baseline;justify-content:space-between;gap:6px;}
+.mc-val{font-size:22px;font-weight:800;letter-spacing:-.03em;line-height:1;}
 .mc-val.o{color:var(--o);}
 .mc-val.b{color:var(--qz);}
 .mc-val.g{color:var(--cl);}
 .mc-val.v{color:var(--ta);}
-.mc-lbl{font-size:11px;color:var(--tx2);font-weight:400;}
-.mc-sub{font-size:11px;color:var(--tx3);margin-top:2px;}
+.mc-sub{font-size:10px;color:var(--tx3);text-align:right;line-height:1.4;max-width:90px;}
 
 /* ═══════════════════════════════════════════════════════
    CONTENT LAYOUT (table + feed side by side)
@@ -401,70 +407,53 @@ body{background:var(--page);color:var(--tx);overflow:hidden;}
 /* ═══════════════════════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════════════════════ */
-@media(max-width:1024px){.content-row{grid-template-columns:1fr;}}
+@media(max-width:1280px){.ov-grid{grid-template-columns:1fr 280px;}}
+@media(max-width:1024px){.ov-grid{grid-template-columns:1fr;}.metric-strip{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:768px){
   #app{grid-template-columns:1fr;}
   .sb{display:none;}
   .main-body{padding:16px;}
-  .metric-strip{gap:8px;}
-  .metric-chip{min-width:100px;}
+  .metric-strip{grid-template-columns:repeat(2,1fr);gap:8px;}
   .charts-row{grid-template-columns:1fr;}
-  .ov-bottom{grid-template-columns:1fr;}
 }
 
 /* ═══ CHARTS ROW ══════════════════════════════════════ */
 .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
-.chart-wrap{padding:14px 16px 10px;height:190px;position:relative;}
+.chart-wrap{padding:14px 16px 10px;height:145px;position:relative;}
 .chart-lbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx2);margin-bottom:10px;}
-
-/* Legend row for donut chart */
-.chart-legend{display:flex;gap:12px;padding:8px 16px 12px;flex-wrap:wrap;border-top:1px solid var(--line);}
+.chart-legend{display:flex;gap:10px;padding:6px 16px 10px;flex-wrap:wrap;border-top:1px solid var(--line);}
 .cl-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--tx2);}
 .cl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
-/* ═══ OV-BOTTOM LAYOUT ══════════════════════════════════ */
-.ov-bottom{display:grid;grid-template-columns:1fr 280px;gap:14px;}
-.ov-left{display:flex;flex-direction:column;gap:14px;}
+/* ═══ OV-GRID LAYOUT ══════════════════════════════════ */
+.ov-grid{display:grid;grid-template-columns:1fr 300px;gap:14px;}
+.ov-main{display:flex;flex-direction:column;gap:14px;}
+.ov-side{display:flex;flex-direction:column;gap:14px;}
 
-/* ═══ CHAMPIONS CARD ═══════════════════════════════════ */
-.champ-content{display:flex;align-items:stretch;min-height:160px;}
-.champ-hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 16px;text-align:center;border-right:1px solid var(--line);}
+/* ═══ CHAMPIONS CARD — vertical stacked ═══════════════ */
+.champ-content{display:flex;flex-direction:column;}
 .champ-av-wrap{position:relative;margin-bottom:10px;}
-.champ-av{
-  width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-size:24px;font-weight:800;color:var(--o);
-  background:var(--oh);border:2px solid rgba(255,77,13,.3);
-}
-.champ-crown{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:18px;}
-.champ-hero-name{font-size:15px;font-weight:700;color:var(--tx);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;}
+.champ-av{width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:800;color:var(--o);background:var(--oh);border:2px solid rgba(255,77,13,.3);}
+.champ-crown{position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-size:17px;}
+/* Hero: full-width top section */
+.champ-hero-v{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 16px 14px;text-align:center;border-bottom:1px solid var(--line);}
+.champ-hero-name{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;}
 .champ-hero-score{font-size:26px;font-weight:900;color:var(--o);font-family:var(--mono);line-height:1;}
 .champ-hero-lbl{font-size:10px;color:var(--tx2);font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-top:1px;}
-.champ-badge{
-  display:inline-flex;align-items:center;gap:4px;padding:2px 9px;
-  border-radius:50px;font-size:10px;font-weight:700;
-  background:rgba(255,215,0,.1);color:#f5c518;
-  border:1px solid rgba(255,215,0,.25);margin-top:8px;
-}
-
-/* Runner-up rows (right side of champions card) */
-.champ-runners{flex:1;display:flex;flex-direction:column;justify-content:center;}
-.champ-row{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);}
+.champ-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:50px;font-size:10px;font-weight:700;background:rgba(255,215,0,.1);color:#f5c518;border:1px solid rgba(255,215,0,.25);margin-top:8px;}
+/* Runner-up list below champion */
+.champ-runners-v{display:flex;flex-direction:column;}
+.champ-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line);}
 .champ-row:last-child{border-bottom:none;}
-.cr-medal{font-size:16px;width:20px;flex-shrink:0;text-align:center;}
-.cr-av{
-  width:32px;height:32px;border-radius:9px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;font-weight:700;flex-shrink:0;
-}
+.cr-medal{font-size:15px;width:20px;flex-shrink:0;text-align:center;}
+.cr-av{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
 .cr-av.s{background:rgba(192,192,192,.15);color:#c0c0c0;}
 .cr-av.b{background:rgba(205,127,50,.15);color:#cd7f32;}
-.cr-nm{flex:1;font-size:13px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cr-nm{flex:1;font-size:12px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .cr-sc{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--tx2);flex-shrink:0;}
-.champ-empty{flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--tx3);padding:20px;text-align:center;}
-
-/* Champ game tab row */
-.champ-tabs{display:flex;gap:2px;padding:8px 12px;background:var(--surf2);border-bottom:1px solid var(--line);}
-.ctab{padding:5px 12px;border-radius:var(--r);font-size:12px;font-weight:500;color:var(--tx2);transition:var(--t);cursor:pointer;background:none;border:none;}
+.champ-empty{display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--tx3);padding:24px;text-align:center;}
+/* Champ tabs inside panel-hdr */
+.ctab{padding:4px 10px;border-radius:var(--r);font-size:11px;font-weight:500;color:var(--tx2);transition:var(--t);cursor:pointer;background:none;border:none;}
 .ctab:hover{background:var(--hover);color:var(--tx);}
 .ctab.on{background:var(--oh);color:var(--o);}
 </style>
@@ -592,75 +581,108 @@ body{background:var(--page);color:var(--tx);overflow:hidden;}
         <div class="pg-title">Overview</div>
         <div class="pg-sub">Real-time statistics across all NetLearn games</div>
 
-        <!-- Metric strip -->
-        <div class="metric-strip">
-          <div class="metric-chip">
-            <div class="mc-val o" id="st-players">—</div>
-            <div class="mc-lbl">Total Players</div>
-            <div class="mc-sub" id="st-subs">— submissions</div>
-          </div>
-          <div class="metric-chip">
-            <div class="mc-val b" id="st-today">—</div>
-            <div class="mc-lbl">Games Today</div>
-            <div class="mc-sub">last 24 hours</div>
-          </div>
-          <div class="metric-chip">
-            <div class="mc-val g" id="st-high">—</div>
-            <div class="mc-lbl">All-Time High</div>
-            <div class="mc-sub" id="st-high-p">—</div>
-          </div>
-          <div class="metric-chip">
-            <div class="mc-val v" id="st-active" style="font-size:16px;padding-top:2px;">—</div>
-            <div class="mc-lbl">Most Active</div>
-            <div class="mc-sub" id="st-active-c">—</div>
-          </div>
-        </div>
+        <div class="ov-grid">
 
-        <!-- Charts row -->
-        <div class="charts-row">
-          <!-- Game distribution donut -->
-          <div class="panel">
-            <div class="panel-hdr">
-              <div class="panel-title">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 7.07 17.07"/></svg>
-                Game Distribution
-              </div>
-            </div>
-            <div class="chart-wrap"><canvas id="chart-dist"></canvas></div>
-            <div class="chart-legend" id="chart-dist-legend"></div>
-          </div>
-          <!-- 7-day activity bar -->
-          <div class="panel">
-            <div class="panel-hdr">
-              <div class="panel-title">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                Activity — Last 7 Days
-              </div>
-            </div>
-            <div class="chart-wrap"><canvas id="chart-weekly"></canvas></div>
-          </div>
-        </div>
+          <!-- ── LEFT MAIN: metrics + charts + recent scores ── -->
+          <div class="ov-main">
 
-        <!-- OV-BOTTOM: champions + recent scores | live feed -->
-        <div class="ov-bottom">
-          <div class="ov-left">
+            <!-- Metric strip: 4 taller chips with icon + sparkline -->
+            <div class="metric-strip">
 
-            <!-- Champions card -->
-            <div class="panel" id="champ-panel">
-              <div class="panel-hdr">
-                <div class="panel-title">🏆 Champions</div>
-                <div class="panel-actions">
-                  <button class="ctab on" id="ct-time_attack" onclick="showChamp('time_attack',this)">⚡ TA</button>
-                  <button class="ctab" id="ct-quiz" onclick="showChamp('quiz',this)">❓ Quiz</button>
-                  <button class="ctab" id="ct-ip_class" onclick="showChamp('ip_class',this)">🔥 IPC</button>
+              <!-- Total Players -->
+              <div class="metric-chip">
+                <div class="mc-top-row">
+                  <div class="mc-icon-box o">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </div>
+                  <svg class="mc-spark" id="spark-players" viewBox="0 0 72 28" preserveAspectRatio="none">
+                    <path d="M0,24 L12,18 L24,20 L36,12 L48,8 L60,10 L72,4" stroke="var(--o)" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="mc-lbl">Total Players</div>
+                <div class="mc-bottom-row">
+                  <div class="mc-val o" id="st-players">—</div>
+                  <div class="mc-sub" id="st-subs">— sessions</div>
                 </div>
               </div>
-              <div class="champ-content" id="champ-content">
-                <div class="champ-empty">Loading champions…</div>
-              </div>
-            </div>
 
-            <!-- Recent scores panel -->
+              <!-- Games Today -->
+              <div class="metric-chip">
+                <div class="mc-top-row">
+                  <div class="mc-icon-box b">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  </div>
+                  <svg class="mc-spark" id="spark-today" viewBox="0 0 72 28" preserveAspectRatio="none">
+                    <path d="M0,22 L18,20 L36,14 L48,16 L60,8 L72,6" stroke="var(--qz)" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="mc-lbl">Games Today</div>
+                <div class="mc-bottom-row">
+                  <div class="mc-val b" id="st-today">—</div>
+                  <div class="mc-sub">last 24h</div>
+                </div>
+              </div>
+
+              <!-- All-Time High -->
+              <div class="metric-chip">
+                <div class="mc-top-row">
+                  <div class="mc-icon-box g">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                  </div>
+                  <svg class="mc-spark" id="spark-high" viewBox="0 0 72 28" preserveAspectRatio="none">
+                    <path d="M0,20 L24,16 L36,10 L48,4 L60,8 L72,6" stroke="var(--cl)" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="mc-lbl">All-Time High</div>
+                <div class="mc-bottom-row">
+                  <div class="mc-val g" id="st-high">—</div>
+                  <div class="mc-sub" id="st-high-p">—</div>
+                </div>
+              </div>
+
+              <!-- Most Active -->
+              <div class="metric-chip">
+                <div class="mc-top-row">
+                  <div class="mc-icon-box v">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                  </div>
+                  <svg class="mc-spark" id="spark-active" viewBox="0 0 72 28" preserveAspectRatio="none">
+                    <path d="M0,18 L12,20 L24,12 L36,6 L48,14 L60,8 L72,4" stroke="var(--ta)" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div class="mc-lbl">Most Active</div>
+                <div class="mc-bottom-row">
+                  <div class="mc-val v" id="st-active">—</div>
+                  <div class="mc-sub" id="st-active-c">—</div>
+                </div>
+              </div>
+
+            </div><!-- /metric-strip -->
+
+            <!-- Charts row: side by side, average height -->
+            <div class="charts-row">
+              <div class="panel">
+                <div class="panel-hdr">
+                  <div class="panel-title">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 7.07 17.07"/></svg>
+                    Game Distribution
+                  </div>
+                </div>
+                <div class="chart-wrap"><canvas id="chart-dist"></canvas></div>
+                <div class="chart-legend" id="chart-dist-legend"></div>
+              </div>
+              <div class="panel">
+                <div class="panel-hdr">
+                  <div class="panel-title">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    Activity — Last 7 Days
+                  </div>
+                </div>
+                <div class="chart-wrap"><canvas id="chart-weekly"></canvas></div>
+              </div>
+            </div><!-- /charts-row -->
+
+            <!-- Recent Scores -->
             <div class="panel">
               <div class="panel-hdr">
                 <div class="panel-title">
@@ -679,29 +701,52 @@ body{background:var(--page);color:var(--tx);overflow:hidden;}
               </div>
             </div>
 
-          </div><!-- /ov-left -->
+          </div><!-- /ov-main -->
 
-          <!-- Live feed panel -->
-          <div class="panel feed-panel">
-            <div class="panel-hdr">
-              <div class="panel-title">
-                <div class="ldot" id="fdot" style="width:6px;height:6px;opacity:.5"></div>
-                Live Feed
+          <!-- ── RIGHT SIDE: Champions above Live Feed ── -->
+          <div class="ov-side">
+
+            <!-- Champions card: tabs in header, hero full-width, runners below -->
+            <div class="panel" id="champ-panel">
+              <div class="panel-hdr">
+                <div class="panel-title">🏆 Champions</div>
+                <div class="panel-actions">
+                  <button class="ctab on" id="ct-time_attack" onclick="showChamp('time_attack',this)">⚡ TA</button>
+                  <button class="ctab" id="ct-quiz" onclick="showChamp('quiz',this)">❓ Quiz</button>
+                  <button class="ctab" id="ct-ip_class" onclick="showChamp('ip_class',this)">🔥 IPC</button>
+                </div>
               </div>
-              <span style="font-size:11px;color:var(--tx2);" id="fcount-lbl">0 events</span>
+              <div class="champ-content" id="champ-content">
+                <div class="champ-empty">Loading champions…</div>
+              </div>
             </div>
-            <div class="feed-meta-row">
-              <div class="feed-mini"><div class="fm-val" id="ms-ta">0</div><div class="fm-lbl">TA</div></div>
-              <div class="feed-mini"><div class="fm-val" id="ms-qz">0</div><div class="fm-lbl">Quiz</div></div>
-              <div class="feed-mini"><div class="fm-val" id="ms-cl">0</div><div class="fm-lbl">IPC</div></div>
-            </div>
-            <div class="feed-list" id="fl-ov">
-              <div class="empty"><div class="empty-ico">📡</div><div class="empty-txt">Waiting for players…</div></div>
-            </div>
-          </div>
 
-        </div><!-- /ov-bottom -->
-      </div>
+            <!-- Live feed panel -->
+            <div class="panel feed-panel">
+              <div class="panel-hdr">
+                <div class="panel-title">
+                  <div class="ldot" id="fdot" style="width:6px;height:6px;opacity:.5"></div>
+                  Live Feed
+                </div>
+                <span style="font-size:11px;color:var(--tx2);" id="fcount-lbl">0 events</span>
+              </div>
+              <div class="feed-meta-row">
+                <div class="feed-mini"><div class="fm-val" id="ms-ta">0</div><div class="fm-lbl">TA</div></div>
+                <div class="feed-mini"><div class="fm-val" id="ms-qz">0</div><div class="fm-lbl">Quiz</div></div>
+                <div class="feed-mini"><div class="fm-val" id="ms-cl">0</div><div class="fm-lbl">IPC</div></div>
+              </div>
+              <div class="feed-list" id="fl-ov">
+                <div class="empty"><div class="empty-ico">📡</div><div class="empty-txt">Waiting for players…</div></div>
+              </div>
+            </div>
+
+          </div><!-- /ov-side -->
+
+        </div><!-- /ov-grid -->
+      </div><!-- /view-overview -->
+
+
+
 
       <!-- ──── LEADERBOARD VIEW ──── -->
       <div class="view" id="view-leaderboard">
@@ -943,9 +988,10 @@ async function loadStats(){
       d.recent.forEach(r=>pushFeed(r,false,'fl-ov'));
       renderRecent(d.recent);
     }
-    /* ── Charts ── */
+    /* ── Charts + Sparklines ── */
     renderDistChart(d.byGame||[]);
     renderWeeklyChart(d.weekly||[]);
+    renderSparklines(d.weekly||[]);
   }catch(e){console.warn('Stats:',e);}
 }
 
@@ -1191,7 +1237,7 @@ function renderChampions(){
   const init = nm => (nm||'?')[0].toUpperCase();
 
   cc.innerHTML = `
-    <div class="champ-hero">
+    <div class="champ-hero-v">
       <div class="champ-av-wrap">
         <div class="champ-av">${init(p1?.player_name)}</div>
         <div class="champ-crown">👑</div>
@@ -1201,20 +1247,39 @@ function renderChampions(){
       <div class="champ-hero-lbl">${g.unit}</div>
       <span class="champ-badge">🥇 Champion</span>
     </div>
-    <div class="champ-runners">
+    <div class="champ-runners-v">
       ${p2 ? `<div class="champ-row">
         <span class="cr-medal">🥈</span>
         <div class="cr-av s">${init(p2.player_name)}</div>
         <span class="cr-nm">${esc(p2.player_name)}</span>
         <span class="cr-sc">${p2.score} ${g.unit}</span>
-      </div>` : '<div class="champ-empty" style="flex:1;padding:12px">No #2 yet</div>'}
+      </div>` : '<div class="champ-empty" style="flex:1;min-height:48px">No #2 yet</div>'}
       ${p3 ? `<div class="champ-row">
         <span class="cr-medal">🥉</span>
         <div class="cr-av b">${init(p3.player_name)}</div>
         <span class="cr-nm">${esc(p3.player_name)}</span>
         <span class="cr-sc">${p3.score} ${g.unit}</span>
-      </div>` : '<div class="champ-empty" style="flex:1;padding:12px">No #3 yet</div>'}
+      </div>` : '<div class="champ-empty" style="flex:1;min-height:48px">No #3 yet</div>'}
     </div>`;
+}
+
+/* ═══ SPARKLINES ═════════════════════════════════════════ */
+function makeSparkPath(vals, w, h){
+  w=w||72; h=h||28;
+  if(!vals||vals.length<2) return `M0,${h} L${w},${Math.round(h*0.4)}`;
+  const max=Math.max(...vals,1);
+  const step=w/(vals.length-1);
+  return 'M'+vals.map((v,i)=>`${Math.round(i*step)},${Math.round(h-(v/max)*(h*0.9))}`).join(' L');
+}
+
+function renderSparklines(weekly){
+  const vals=weekly.map(r=>parseInt(r.submissions)||0);
+  if(!vals.length) return;
+  const path=makeSparkPath(vals);
+  ['spark-players','spark-today','spark-high','spark-active'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){ const p=el.querySelector('path'); if(p) p.setAttribute('d',path); }
+  });
 }
 
 /* ═══════════════════════════════════════════════════
