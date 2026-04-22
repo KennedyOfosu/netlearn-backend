@@ -437,29 +437,59 @@ body{background:var(--page);color:var(--tx);overflow:hidden;}
 /* Right column: sticky, viewport-height, flex column so feed fills it */
 .ov-side{position:sticky;top:24px;height:calc(100vh - 96px);display:flex;flex-direction:column;gap:14px;overflow:hidden;}
 
+/* ═══ CHAMPIONS CARD — vertical stacked ═�
+r(--tx);}
+.ctab.on{background:var(--oh);color:var(--o);}
+scores panel can flex-grow */
+.ov-main{display:flex;flex-direction:column;gap:14px;min-height:calc(100vh - 96px);}
+/* Recent scores panel stretches to fill remaining ov-main height */
+.ov-main > .panel:last-child{flex:1;min-height:0;display:flex;flex-direction:column;}
+#recent-body{flex:1;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;}
+#recent-body::-webkit-scrollbar{display:none;}
+/* Right column: sticky, viewport-height, flex column so feed fills it */
+.ov-side{position:sticky;top:24px;height:calc(100vh - 96px);display:flex;flex-direction:column;gap:14px;overflow:hidden;}
+
 /* ═══ CHAMPIONS CARD — vertical stacked ═══════════════ */
 .champ-content{display:flex;flex-direction:column;}
-.champ-av-wrap{position:relative;margin-bottom:10px;}
+.champ-av-wrap{position:relative;margin-bottom:14px;}
 .champ-av{width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:800;color:var(--o);background:var(--oh);border:2px solid rgba(255,77,13,.3);}
 .champ-crown{position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-size:17px;}
 /* Hero: full-width, fixed height so toggling tabs doesn’t resize card */
-.champ-hero-v{display:flex;flex-direction:column;align-items:center;justify-content:center;height:165px;flex-shrink:0;padding:0 16px;text-align:center;border-bottom:1px solid var(--line);}
-.champ-hero-name{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;}
-.champ-hero-score{font-size:26px;font-weight:900;color:var(--o);font-family:var(--mono);line-height:1;}
-.champ-hero-lbl{font-size:10px;color:var(--tx2);font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-top:1px;}
-.champ-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:50px;font-size:10px;font-weight:700;background:rgba(255,215,0,.1);color:#f5c518;border:1px solid rgba(255,215,0,.25);margin-top:8px;}
+.champ-hero-v{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:190px;flex-shrink:0;padding:22px 20px 20px;text-align:center;border-bottom:1px solid var(--line);}
+.champ-hero-name{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px;animation:champInfoCycle 4s ease-in-out infinite;}
+.champ-hero-score{font-size:26px;font-weight:900;color:var(--o);font-family:var(--mono);line-height:1;animation:champInfoCycle 4s ease-in-out infinite;}
+.champ-hero-lbl{font-size:10px;color:var(--tx2);font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-top:3px;animation:champInfoCycle 4s ease-in-out infinite;}
+.champ-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 11px;border-radius:50px;font-size:10px;font-weight:700;background:rgba(255,215,0,.1);color:#f5c518;border:1px solid rgba(255,215,0,.25);margin-top:10px;animation:champBadgePulse 4s ease-in-out infinite;}
 /* Runner-up rows: fixed height each */
 .champ-runners-v{display:flex;flex-direction:column;flex-shrink:0;}
-.champ-row{display:flex;align-items:center;gap:10px;height:48px;padding:0 14px;border-bottom:1px solid var(--line);flex-shrink:0;}
-.champ-row:last-child{border-bottom:none;}
+.champ-row{display:flex;align-items:center;gap:12px;min-height:54px;padding:10px 18px;border-bottom:1px solid var(--line);flex-shrink:0;}
+.champ-row:last-child{border-bottom:none;padding-bottom:14px;}
 .cr-medal{font-size:15px;width:20px;flex-shrink:0;text-align:center;}
-.cr-av{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.cr-av{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
 .cr-av.s{background:rgba(192,192,192,.15);color:#c0c0c0;}
 .cr-av.b{background:rgba(205,127,50,.15);color:#cd7f32;}
 .cr-nm{flex:1;font-size:12px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .cr-sc{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--tx2);flex-shrink:0;}
 /* Empty slot: same fixed height as a runner row */
-.champ-empty{display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--tx3);height:48px;flex-shrink:0;}
+.champ-empty{display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--tx3);min-height:54px;padding:10px 18px;flex-shrink:0;}
+
+/* -- Champion badge looping animations ------------------------------------ */
+/* Badge: idle -> glow up -> hold bright -> fade back (4 s loop) */
+@keyframes champBadgePulse{
+  0%   {box-shadow:none;background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.25);transform:scale(1);}
+  30%  {box-shadow:0 0 0 4px rgba(255,215,0,.08);background:rgba(255,215,0,.22);border-color:rgba(255,215,0,.6);transform:scale(1.08);}
+  50%  {box-shadow:0 0 14px 5px rgba(255,215,0,.32);background:rgba(255,215,0,.28);border-color:rgba(255,215,0,.85);transform:scale(1.12);}
+  70%  {box-shadow:0 0 0 4px rgba(255,215,0,.08);background:rgba(255,215,0,.22);border-color:rgba(255,215,0,.6);transform:scale(1.08);}
+  100% {box-shadow:none;background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.25);transform:scale(1);}
+}
+/* Info (name/score/label): softly dims while badge is at full glow */
+@keyframes champInfoCycle{
+  0%   {opacity:1;}
+  35%  {opacity:.55;}
+  50%  {opacity:.38;}
+  65%  {opacity:.55;}
+  100% {opacity:1;}
+}
 /* Champ tabs inside panel-hdr */
 .ctab{padding:4px 10px;border-radius:var(--r);font-size:11px;font-weight:500;color:var(--tx2);transition:var(--t);cursor:pointer;background:none;border:none;}
 .ctab:hover{background:var(--hover);color:var(--tx);}
