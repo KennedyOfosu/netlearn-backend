@@ -346,8 +346,8 @@ body{background:var(--page);color:var(--tx);overflow:hidden;}
 /* ═══════════════════════════════════════════════════════
    LIVE FEED
 ═══════════════════════════════════════════════════════ */
-.feed-panel{display:flex;flex-direction:column;max-height:480px;}
-.feed-list{overflow-y:auto;flex:1;}
+.feed-panel{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;}
+.feed-list{overflow-y:auto;flex:1;scrollbar-width:none;-ms-overflow-style:none;}
 .feed-list::-webkit-scrollbar{display:none;}
 
 .feed-item{
@@ -374,6 +374,7 @@ body{background:var(--page);color:var(--tx);overflow:hidden;}
 /* Mini stats row inside feed panel */
 .feed-meta-row{
   display:flex;gap:0;border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:2;background:var(--surf);
 }
 .feed-mini{flex:1;padding:8px 12px;text-align:center;border-right:1px solid var(--line);}
 .feed-mini:last-child{border-right:none;}
@@ -426,24 +427,30 @@ body{background:var(--page);color:var(--tx);overflow:hidden;}
 .cl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
 /* ═══ OV-GRID LAYOUT ══════════════════════════════════ */
-.ov-grid{display:grid;grid-template-columns:1fr 300px;gap:14px;}
-.ov-main{display:flex;flex-direction:column;gap:14px;}
-.ov-side{display:flex;flex-direction:column;gap:14px;}
+.ov-grid{display:grid;grid-template-columns:1fr 300px;gap:14px;align-items:start;}
+/* Left column: tall enough so recent-scores panel can flex-grow */
+.ov-main{display:flex;flex-direction:column;gap:14px;min-height:calc(100vh - 96px);}
+/* Recent scores panel stretches to fill remaining ov-main height */
+.ov-main > .panel:last-child{flex:1;min-height:0;display:flex;flex-direction:column;}
+#recent-body{flex:1;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;}
+#recent-body::-webkit-scrollbar{display:none;}
+/* Right column: sticky, viewport-height, flex column so feed fills it */
+.ov-side{position:sticky;top:24px;height:calc(100vh - 96px);display:flex;flex-direction:column;gap:14px;overflow:hidden;}
 
 /* ═══ CHAMPIONS CARD — vertical stacked ═══════════════ */
 .champ-content{display:flex;flex-direction:column;}
 .champ-av-wrap{position:relative;margin-bottom:10px;}
 .champ-av{width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:800;color:var(--o);background:var(--oh);border:2px solid rgba(255,77,13,.3);}
 .champ-crown{position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-size:17px;}
-/* Hero: full-width top section */
-.champ-hero-v{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 16px 14px;text-align:center;border-bottom:1px solid var(--line);}
+/* Hero: full-width, fixed height so toggling tabs doesn’t resize card */
+.champ-hero-v{display:flex;flex-direction:column;align-items:center;justify-content:center;height:165px;flex-shrink:0;padding:0 16px;text-align:center;border-bottom:1px solid var(--line);}
 .champ-hero-name{font-size:14px;font-weight:700;color:var(--tx);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;}
 .champ-hero-score{font-size:26px;font-weight:900;color:var(--o);font-family:var(--mono);line-height:1;}
 .champ-hero-lbl{font-size:10px;color:var(--tx2);font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-top:1px;}
 .champ-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:50px;font-size:10px;font-weight:700;background:rgba(255,215,0,.1);color:#f5c518;border:1px solid rgba(255,215,0,.25);margin-top:8px;}
-/* Runner-up list below champion */
-.champ-runners-v{display:flex;flex-direction:column;}
-.champ-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line);}
+/* Runner-up rows: fixed height each */
+.champ-runners-v{display:flex;flex-direction:column;flex-shrink:0;}
+.champ-row{display:flex;align-items:center;gap:10px;height:48px;padding:0 14px;border-bottom:1px solid var(--line);flex-shrink:0;}
 .champ-row:last-child{border-bottom:none;}
 .cr-medal{font-size:15px;width:20px;flex-shrink:0;text-align:center;}
 .cr-av{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
@@ -451,7 +458,8 @@ body{background:var(--page);color:var(--tx);overflow:hidden;}
 .cr-av.b{background:rgba(205,127,50,.15);color:#cd7f32;}
 .cr-nm{flex:1;font-size:12px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .cr-sc{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--tx2);flex-shrink:0;}
-.champ-empty{display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--tx3);padding:24px;text-align:center;}
+/* Empty slot: same fixed height as a runner row */
+.champ-empty{display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--tx3);height:48px;flex-shrink:0;}
 /* Champ tabs inside panel-hdr */
 .ctab{padding:4px 10px;border-radius:var(--r);font-size:11px;font-weight:500;color:var(--tx2);transition:var(--t);cursor:pointer;background:none;border:none;}
 .ctab:hover{background:var(--hover);color:var(--tx);}
